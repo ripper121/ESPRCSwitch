@@ -149,7 +149,7 @@ void setup ( void ) {
 
 
   server.onNotFound ( []() {
-    Serial.println("Page Not Found");
+    //Serial.println("Page Not Found");
     server.send ( 400, "text/html", "Page not Found" );
   }  );
   server.begin();
