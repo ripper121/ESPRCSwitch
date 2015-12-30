@@ -110,7 +110,7 @@ void setup ( void ) {
   server.on ( "/admin/filldynamicdata", filldynamicdata );
 
   server.on ( "/favicon.ico",   []() {
-    Serial.println("favicon.ico");
+    //Serial.println("favicon.ico");
     server.send ( 200, "text/html", "" );
   }  );
 
@@ -182,18 +182,19 @@ void loop ( void ) {
       cNTP_Update = 0;
       firstStart = false;
       Serial.print("Local address: ");
-      Serial.println(WiFi.localIP());
+      Serial.println(WiFi.localIP());      
+      Serial.printf("FreeMem:%d %d:%d:%d %d.%d.%d \n",ESP.getFreeHeap() , DateTime.hour,DateTime.minute, DateTime.second, DateTime.year, DateTime.month, DateTime.day);
     }
     else if ( cNTP_Update > (config.Update_Time_Via_NTP_Every * 60) )
     {
       NTPRefresh();
       cNTP_Update = 0;
       Serial.print("Local address: ");
-      Serial.println(WiFi.localIP());
+      Serial.println(WiFi.localIP());      
+      Serial.printf("FreeMem:%d %d:%d:%d %d.%d.%d \n",ESP.getFreeHeap() , DateTime.hour,DateTime.minute, DateTime.second, DateTime.year, DateTime.month, DateTime.day);
     }
   }
   server.handleClient();
-
 
   /*
        Your Code here
@@ -202,17 +203,7 @@ void loop ( void ) {
   if (Refresh)
   {
     Refresh = false;
-
     ///Serial.println("Refreshing...");
-    //Serial.printf("FreeMem:%d %d:%d:%d %d.%d.%d \n",ESP.getFreeHeap() , DateTime.hour,DateTime.minute, DateTime.second, DateTime.year, DateTime.month, DateTime.day);
-
-
   }
-
-
-
-
-
-
 }
 

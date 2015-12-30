@@ -5,17 +5,53 @@
 //
 const char PAGE_example[] PROGMEM = R"=====(
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
+  <script>
+      $(document).bind('mobileinit',function(){
+          $.mobile.pushStateEnabled = false;
+      });
+  </script>
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquerymobile/1.4.5/jquery.mobile.min.js"></script> 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />   
-   <a href="?switch0=on"   style="width:250px"  class="btn btn--full btn--blue" align="center">Switch 0 On</a><br>
-   <a href="?switch0=off"   style="width:250px"  class="btn btn--full btn--blue" align="center">Switch 0 Off</a><br>   
-   <a href="admin.html"   style="width:250px"  class="btn btn--full btn--blue" align="center">Admin Page</a><br>
+    <div data-role="page" id="page1" data-theme="b">
+        <div data-role="header">
+            <h1>Home Automation</h1>
+        </div>
+        <div data-role="content">
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                    <a data-role="button" onclick="window.location = '/?switch0=on';" >Switch-1 ON</a>
+                    <a data-role="button" >Switch-2 ON</a>
+                    <a data-role="button">Switch-3 ON</a>
+                    <a data-role="button">Switch-4 ON</a>
+                    <a data-role="button">Switch-5 ON</a>
+                    <a data-role="button">Switch-6 ON</a>
+                    <a data-role="button">Switch-7 ON</a>
+                    <a data-role="button">Switch-8 ON</a>
+                    <a data-role="button">Switch-9 ON</a>
+                    <a data-role="button">Switch-10 ON</a>
+                </div>
+                <div class="ui-block-b">
+                    <a data-role="button" onclick="window.location = '/?switch0=off';">Switch-1 OFF</a>
+                    <a data-role="button">Switch-2 OFF</a>
+                    <a data-role="button">Switch-3 OFF</a>
+                    <a data-role="button">Switch-4 OFF</a>
+                    <a data-role="button">Switch-5 OFF</a>
+                    <a data-role="button">Switch-6 OFF</a>
+                    <a data-role="button">Switch-7 OFF</a>
+                    <a data-role="button">Switch-8 OFF</a>
+                    <a data-role="button">Switch-9 OFF</a>
+                    <a data-role="button">Switch-10 OFF</a>
+                </div>
+            </div>
+        </div>  
+        <a data-role="button" onclick="window.location = '/admin.html';" data-mini="true">Admin Page</a>
+      </div>
+      <div data-role="footer">
+      </div>
+
    <script>
-		window.onload = function ()
-		{
-			load("style.css","css", function() 
-			{
-			});
-		}
 		function load(e,t,n){if("js"==t){var a=document.createElement("script");a.src=e,a.type="text/javascript",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}else if("css"==t){var a=document.createElement("link");a.href=e,a.rel="stylesheet",a.type="text/css",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}}
    </script>
 
