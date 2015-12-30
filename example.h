@@ -80,20 +80,59 @@ const char PAGE_example[] PROGMEM = R"=====(
 
 
 void filldynamicdata()
-{        
+{
 
 }
 
+char* HOMEID="11111";
 void processExample()
-{        
-    if (server.args() > 0 )  // Are there any POST/GET Fields ? 
-    {
-       for ( uint8_t i = 0; i < server.args(); i++ ) {
-                if (server.argName(i) == "switch0" && server.arg(i)=="on") mySwitch.switchOn("11111", "00000");
-                if (server.argName(i) == "switch0" && server.arg(i)=="off") mySwitch.switchOff("11111", "00000");                
-        }
+{
+  if (server.args() > 0 )  // Are there any POST/GET Fields ?
+  {
+    for ( uint8_t i = 0; i < server.args(); i++ ) {
+      if (server.argName(i) == "switch0" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "00000");
+      if (server.argName(i) == "switch0" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "00000");
+      if (server.argName(i) == "switch1" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "10000");
+      if (server.argName(i) == "switch1" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "10000");
+      if (server.argName(i) == "switch2" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "01000");
+      if (server.argName(i) == "switch2" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "01000");
+      if (server.argName(i) == "switch3" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "11000");
+      if (server.argName(i) == "switch3" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "11000");
+      if (server.argName(i) == "switch4" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "00100");
+      if (server.argName(i) == "switch4" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "00100");
+      if (server.argName(i) == "switch5" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "10100");
+      if (server.argName(i) == "switch5" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "10100");
+      if (server.argName(i) == "switch6" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "01100");
+      if (server.argName(i) == "switch6" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "01100");
+      if (server.argName(i) == "switch7" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "11100");
+      if (server.argName(i) == "switch7" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "11100");
+      if (server.argName(i) == "switch8" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "00010");
+      if (server.argName(i) == "switch8" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "00010");
+      if (server.argName(i) == "switch9" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "10010");
+      if (server.argName(i) == "switch9" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "10010");
     }
-    
-    server.send ( 200, "text/html", PAGE_example  ); 
+  }
+  server.send ( 200, "text/html", PAGE_example  );
 }
 
+
+//For Offline Use with FTP SRC
+/*
+  <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+  <script src="ftp://anonymouse@192.168.10.98/jquery.min.js"></script> 
+  <script>
+      $(document).bind('mobileinit',function(){
+          $.mobile.pushStateEnabled = false;
+      });
+  </script>
+  <link rel="stylesheet" href="ftp://anonymouse@192.168.10.98/jquery.mobile.min.css">
+  <script src="ftp://anonymouse@192.168.10.98/jquery.mobile.min.js"></script>
+  <style> 
+  .ui-grid-a .ui-btn {
+   width : 100px !important;
+  }
+  </style>
+  </head>
+*/
