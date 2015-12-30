@@ -22,6 +22,13 @@ const char PAGE_example[] PROGMEM = R"=====(
    width : 100px !important;
   }
   </style>
+  <script>
+  $(document).ready(function() {
+    $(".ui-btn").click(function() {  
+      $.mobile.loading( 'show' );
+    });       
+  }); 
+  </script>
   </head>
   <body>  
     <div data-role="page" id="page1" data-theme="b">
