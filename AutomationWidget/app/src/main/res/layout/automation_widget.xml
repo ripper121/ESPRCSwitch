@@ -1,0 +1,158 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#09C"
+    android:padding="@dimen/widget_margin">
+
+    <TextView
+        android:id="@+id/textView_output"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#09C"
+        android:contentDescription="@string/appwidget_text"
+        android:text="@string/appwidget_text"
+        android:textColor="#ffffff"
+        android:textSize="10sp"
+        android:textStyle="bold|italic"
+        android:layout_below="@+id/switch6On"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:textAlignment="center" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch0On"
+        android:id="@+id/switch0On"
+        android:textSize="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch0Off"
+        android:id="@+id/switch0Off"
+        android:textSize="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch1On"
+        android:id="@+id/switch1On"
+        android:textSize="8dp"
+        android:layout_below="@+id/switch0On"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch1Off"
+        android:id="@+id/switch1Off"
+        android:layout_below="@+id/switch0Off"
+        android:layout_alignLeft="@+id/switch0Off"
+        android:layout_alignStart="@+id/switch0Off"
+        android:textSize="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch2On"
+        android:id="@+id/switch2On"
+        android:textSize="8dp"
+        android:layout_below="@+id/switch1On"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch2Off"
+        android:id="@+id/switch2Off"
+        android:layout_below="@+id/switch1Off"
+        android:layout_alignLeft="@+id/switch1Off"
+        android:layout_alignStart="@+id/switch1Off"
+        android:textSize="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch3On"
+        android:id="@+id/switch3On"
+        android:textSize="8dp"
+        android:layout_below="@+id/switch2On"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch3Off"
+        android:id="@+id/switch3Off"
+        android:layout_below="@+id/switch2Off"
+        android:layout_alignLeft="@+id/switch2Off"
+        android:layout_alignStart="@+id/switch2Off"
+        android:textSize="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch4On"
+        android:id="@+id/switch4On"
+        android:textSize="8dp"
+        android:layout_below="@+id/switch3On"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch4Off"
+        android:id="@+id/switch4Off"
+        android:layout_below="@+id/switch3Off"
+        android:layout_alignLeft="@+id/switch3Off"
+        android:layout_alignStart="@+id/switch3Off"
+        android:textSize="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch5On"
+        android:id="@+id/switch5On"
+        android:textSize="8dp"
+        android:layout_below="@+id/switch4On"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch5Off"
+        android:id="@+id/switch5Off"
+        android:layout_below="@+id/switch4Off"
+        android:layout_alignLeft="@+id/switch4Off"
+        android:layout_alignStart="@+id/switch4Off"
+        android:textSize="8dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch6On"
+        android:id="@+id/switch6On"
+        android:textSize="8dp"
+        android:layout_below="@+id/switch5On"
+        android:layout_alignParentLeft="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Switch6Off"
+        android:id="@+id/switch6Off"
+        android:layout_below="@+id/switch5Off"
+        android:layout_alignLeft="@+id/switch5Off"
+        android:layout_alignStart="@+id/switch5Off"
+        android:textSize="8dp" />
+
+</RelativeLayout>
