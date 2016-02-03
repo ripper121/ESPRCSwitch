@@ -7,34 +7,24 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.provider.SyncStateContract;
 import android.util.Log;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.example.ripper121.automationwidget.R;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Logger;
 
 /**
  * Implementation of App Widget functionality.
  */
-public class AutomationWidget extends AppWidgetProvider{
+public class AutomationWidget extends AppWidgetProvider {
 
     private static final String switch0On = "com.example.ripper121.automationwidget.action.switch0On";
     private static final String switch0Off = "com.example.ripper121.automationwidget.action.switch0Off";
@@ -50,8 +40,14 @@ public class AutomationWidget extends AppWidgetProvider{
     private static final String switch5Off = "com.example.ripper121.automationwidget.action.switch5Off";
     private static final String switch6On = "com.example.ripper121.automationwidget.action.switch6On";
     private static final String switch6Off = "com.example.ripper121.automationwidget.action.switch6Off";
+    private static final String switch7On = "com.example.ripper121.automationwidget.action.switch7On";
+    private static final String switch7Off = "com.example.ripper121.automationwidget.action.switch7Off";
+    private static final String switch8On = "com.example.ripper121.automationwidget.action.switch8On";
+    private static final String switch8Off = "com.example.ripper121.automationwidget.action.switch8Off";
+    private static final String switch9On = "com.example.ripper121.automationwidget.action.switch9On";
+    private static final String switch9Off = "com.example.ripper121.automationwidget.action.switch9Off";
     private String outText = "";
-    private String gatewayURL="";
+    private String gatewayURL = "";
     /*
     private static String getMessage() {
         return String.valueOf(mCount++);
@@ -65,7 +61,7 @@ public class AutomationWidget extends AppWidgetProvider{
     }
 
     @Override
-    public void onUpdate(Context context, AppWidgetManager appWidgetManager,int[] appWidgetIds) {
+    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
         //String message = getMessage();
 
@@ -80,17 +76,23 @@ public class AutomationWidget extends AppWidgetProvider{
             remoteViews.setOnClickPendingIntent(R.id.switch0On, getPendingSelfIntent(context, switch0On));
             remoteViews.setOnClickPendingIntent(R.id.switch0Off, getPendingSelfIntent(context, switch0Off));
             remoteViews.setOnClickPendingIntent(R.id.switch1On, getPendingSelfIntent(context, switch1On));
-            remoteViews.setOnClickPendingIntent(R.id.switch1Off,getPendingSelfIntent(context,switch1Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch1Off, getPendingSelfIntent(context, switch1Off));
             remoteViews.setOnClickPendingIntent(R.id.switch2On, getPendingSelfIntent(context, switch2On));
-            remoteViews.setOnClickPendingIntent(R.id.switch2Off,getPendingSelfIntent(context,switch2Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch2Off, getPendingSelfIntent(context, switch2Off));
             remoteViews.setOnClickPendingIntent(R.id.switch3On, getPendingSelfIntent(context, switch3On));
-            remoteViews.setOnClickPendingIntent(R.id.switch3Off,getPendingSelfIntent(context,switch3Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch3Off, getPendingSelfIntent(context, switch3Off));
             remoteViews.setOnClickPendingIntent(R.id.switch4On, getPendingSelfIntent(context, switch4On));
-            remoteViews.setOnClickPendingIntent(R.id.switch4Off,getPendingSelfIntent(context,switch4Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch4Off, getPendingSelfIntent(context, switch4Off));
             remoteViews.setOnClickPendingIntent(R.id.switch5On, getPendingSelfIntent(context, switch5On));
-            remoteViews.setOnClickPendingIntent(R.id.switch5Off,getPendingSelfIntent(context,switch5Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch5Off, getPendingSelfIntent(context, switch5Off));
             remoteViews.setOnClickPendingIntent(R.id.switch6On, getPendingSelfIntent(context, switch6On));
-            remoteViews.setOnClickPendingIntent(R.id.switch6Off,getPendingSelfIntent(context,switch6Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch6Off, getPendingSelfIntent(context, switch6Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch7On, getPendingSelfIntent(context, switch7On));
+            remoteViews.setOnClickPendingIntent(R.id.switch7Off, getPendingSelfIntent(context, switch7Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch8On, getPendingSelfIntent(context, switch8On));
+            remoteViews.setOnClickPendingIntent(R.id.switch8Off, getPendingSelfIntent(context, switch8Off));
+            remoteViews.setOnClickPendingIntent(R.id.switch9On, getPendingSelfIntent(context, switch9On));
+            remoteViews.setOnClickPendingIntent(R.id.switch9Off, getPendingSelfIntent(context, switch9Off));
             appWidgetManager.updateAppWidget(appWidgetID, remoteViews);
 
         }
@@ -110,7 +112,7 @@ public class AutomationWidget extends AppWidgetProvider{
 
         // Uses getClass().getName() rather than MyWidget.class.getName() for
         // portability into any App Widget Provider Class
-        ComponentName thisAppWidgetComponentName = new ComponentName(context.getPackageName(),getClass().getName());
+        ComponentName thisAppWidgetComponentName = new ComponentName(context.getPackageName(), getClass().getName());
         int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidgetComponentName);
         onUpdate(context, appWidgetManager, appWidgetIds);
     }
@@ -122,100 +124,123 @@ public class AutomationWidget extends AppWidgetProvider{
         SharedPreferences settings = context.getSharedPreferences("PREFS_NAME", 0);
         gatewayURL = settings.getString("gatewayURL", "");
         if (switch0On.equals(intent.getAction())) {
-            new DownloadWebpageTask().execute(gatewayURL);
-            outText=gatewayURL;
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch0=on");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch0Off.equals(intent.getAction())) {
-            outText="1";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch0=off");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch1On.equals(intent.getAction())) {
-            outText="2";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch1=on");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch1Off.equals(intent.getAction())) {
-            outText="3";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch1=off");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch2On.equals(intent.getAction())) {
-            outText="4";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch2=on");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch2Off.equals(intent.getAction())) {
-            outText="5";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch2=off");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch3On.equals(intent.getAction())) {
-            outText="6";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch3=on");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch3Off.equals(intent.getAction())) {
-            outText="7";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch3=off");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch4On.equals(intent.getAction())) {
-            outText="8";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch4=on");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch4Off.equals(intent.getAction())) {
-            outText="9";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch4=off");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch5On.equals(intent.getAction())) {
-            outText="10";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch5=on");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch5Off.equals(intent.getAction())) {
-            outText="11";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch5=off");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch6On.equals(intent.getAction())) {
-            outText="12";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch6=on");
+            outText = gatewayURL;
             onUpdate(context);
         }
 
         if (switch6Off.equals(intent.getAction())) {
-            outText="13";
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch6=off");
+            outText = gatewayURL;
             onUpdate(context);
         }
-    }
 
-    private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... urls) {
-
-            // params comes from the execute() call: params[0] is the url.
-            try {
-                Log.d("DEBUG_TAG", "urls[0]: " + urls[0]);
-                String content = null;
-                if(urls[0]!=null)
-                    content = downloadUrl(urls[0]);
-                else
-                    content= "Empty";
-                Log.d("DEBUG_TAG", "URL:" + content);
-                return content;
-            } catch (IOException e) {
-                Log.d("DEBUG_TAG", "gatewayURL: " + "Unable to retrieve web page. URL may be invalid.");
-                return "Unable to retrieve web page. URL may be invalid.";
-            }
+        if (switch7On.equals(intent.getAction())) {
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch7=on");
+            outText = gatewayURL;
+            onUpdate(context);
         }
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(String result) {
-            //textView.setText(result);
+
+        if (switch7Off.equals(intent.getAction())) {
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch7=off");
+            outText = gatewayURL;
+            onUpdate(context);
+        }
+
+        if (switch8On.equals(intent.getAction())) {
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch8=on");
+            outText = gatewayURL;
+            onUpdate(context);
+        }
+
+        if (switch8Off.equals(intent.getAction())) {
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch8=off");
+            outText = gatewayURL;
+            onUpdate(context);
+        }
+
+        if (switch9On.equals(intent.getAction())) {
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch9=on");
+            outText = gatewayURL;
+            onUpdate(context);
+        }
+
+        if (switch9Off.equals(intent.getAction())) {
+            new DownloadWebpageTask().execute(gatewayURL + "/?switch9=off");
+            outText = gatewayURL;
+            onUpdate(context);
         }
     }
 
@@ -235,12 +260,12 @@ public class AutomationWidget extends AppWidgetProvider{
             // Starts the query
             conn.connect();
             int response = conn.getResponseCode();
-            Log.d("DEBUG_TAG", "The response is: " + response);
             is = conn.getInputStream();
             // Convert the InputStream into a string
-            String contentAsString = readIt(is);
-            Log.d("DEBUG_TAG", "contentAsString: " + contentAsString);
-            return contentAsString;
+            //String contentAsString = readIt(is);
+
+            Log.d("DEBUG_TAG", "GET Successfully");
+            return "true";
 
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
@@ -250,14 +275,42 @@ public class AutomationWidget extends AppWidgetProvider{
             }
         }
     }
+
     public String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder result = new StringBuilder();
         String line;
-        while((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             result.append(line);
         }
         return result.toString();
+    }
+
+    private class DownloadWebpageTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+
+            // params comes from the execute() call: params[0] is the url.
+            try {
+                Log.d("DEBUG_TAG", "urls[0]: " + urls[0]);
+                String content = null;
+                if (urls[0] != null)
+                    content = downloadUrl(urls[0]);
+                else
+                    content = "Empty";
+                Log.d("DEBUG_TAG", "URL:" + content);
+                return content;
+            } catch (IOException e) {
+                Log.d("DEBUG_TAG", "URL: " + "Unable to retrieve web page. URL may be invalid.");
+                return "Unable to retrieve web page. URL may be invalid.";
+            }
+        }
+
+        // onPostExecute displays the results of the AsyncTask.
+        @Override
+        protected void onPostExecute(String result) {
+            //textView.setText(result);
+        }
     }
 
 

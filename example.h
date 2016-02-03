@@ -97,6 +97,10 @@ void processExample()
   if (server.args() > 0 )  // Are there any POST/GET Fields ?
   {
     for ( uint8_t i = 0; i < server.args(); i++ ) {
+      Serial.print("argName: ");
+      Serial.print(server.argName(i));
+      Serial.print(" = arg: ");
+      Serial.println(server.arg(i));
       if (server.argName(i) == "switch0" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "00000");
       if (server.argName(i) == "switch0" && server.arg(i) == "off") mySwitch.switchOff(HOMEID, "00000");
       if (server.argName(i) == "switch1" && server.arg(i) == "on")   mySwitch.switchOn(HOMEID, "10000");
