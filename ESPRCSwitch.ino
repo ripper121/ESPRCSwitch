@@ -52,9 +52,9 @@
 #include "PAGE_NetworkConfiguration.h"
 #include "example.h"
 
-
-#define ACCESS_POINT_NAME  "ESP"
-#define ACCESS_POINT_PASSWORD  "12345678"
+const char *ssid = "ESPap";
+const char *password = "";
+int channel = 11;
 #define AdminTimeOut 180  // Defines the Time in Seconds, when the Admin-Mode will be diabled
 
 
@@ -95,7 +95,7 @@ void setup ( void ) {
   if (AdminEnabled)
   {
     WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP( ACCESS_POINT_NAME , ACCESS_POINT_PASSWORD);
+    WiFi.softAP(ssid,password,channel);
   }
   else
   {
