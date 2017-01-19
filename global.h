@@ -2,6 +2,8 @@
 #define GLOBAL_H
 RCSwitch mySwitch = RCSwitch();
 ESP8266WebServer server(80);									// The Webserver
+ESP8266HTTPUpdateServer httpUpdater;
+
 boolean firstStart = true;										// On firststart = true, NTP will try to get a valid time
 int AdminTimeOutCounter = 0;									// Counter for Disabling the AdminMode
 strDateTime DateTime;											// Global DateTime structure, will be refreshed every Second
@@ -43,11 +45,12 @@ struct strConfig {
 void ConfigureWifi()
 {
   Serial.println("Configuring Wifi");
-  WiFi.begin (config.ssid.c_str(), config.password.c_str());
+  WiFi.begin (config.ssid.c_str(), config.password.c_str());  
   if (!config.dhcp)
   {
     WiFi.config(IPAddress(config.IP[0], config.IP[1], config.IP[2], config.IP[3] ),  IPAddress(config.Gateway[0], config.Gateway[1], config.Gateway[2], config.Gateway[3] ) , IPAddress(config.Netmask[0], config.Netmask[1], config.Netmask[2], config.Netmask[3] ));
   }
+  
 }
 
 void WriteConfig()

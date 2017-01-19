@@ -29,10 +29,13 @@
 
 
 
+
 */
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>
+#include <ESP8266HTTPUpdateServer.h>
 #include <Ticker.h>
 #include <EEPROM.h>
 #include <WiFiUdp.h>
@@ -54,6 +57,8 @@
 
 const char *ssid = "ESPap";
 const char *password = "";
+const char* host = "esp8266-webupdate";
+
 int channel = 11;
 #define AdminTimeOut 180  // Defines the Time in Seconds, when the Admin-Mode will be diabled
 
@@ -151,6 +156,10 @@ void setup ( void ) {
     //Serial.println("Page Not Found");
     server.send ( 400, "text/html", "Page not Found" );
   }  );
+
+  
+  MDNS.begin(host);
+  httpUpdater.setup(&server);
   server.begin();
   Serial.println( "HTTP server started" );
   Serial.print("Server address: ");
