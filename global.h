@@ -1,19 +1,36 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
-RCSwitch mySwitch = RCSwitch();
-ESP8266WebServer server(80);									// The Webserver
-ESP8266HTTPUpdateServer httpUpdater;
 
-boolean firstStart = true;										// On firststart = true, NTP will try to get a valid time
+#define RECEIVER_PIN          5
+#define TRANSMITTER_PIN       4
+
+#define BUTTON_PIN            12
+#define LED_PIN               13
+#define NUMPIXELS             1
+
+#define AdminTimeOut 180  // Defines the Time in Seconds, when the Admin-Mode will be diabled
+
+#define ARRAYSIZE 10
+
+ESP8266WebServer server(80);                  // The Webserver
+ESP8266HTTPUpdateServer httpUpdater;
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, LED_PIN, NEO_GRB + NEO_KHZ800);
+ESPiLight rf(TRANSMITTER_PIN);  //use -1 to disable transmitter
+Ticker tkSecond;                        // Second - Timer for Updating Datetime Structure
+
+String rfRawRec = "";
+bool rfRawReady = false;
+
+String results[ARRAYSIZE] = { "", "", "", "", "", "", "", "", "", "" };
+byte resultCounter = 0;
+
+bool pixelToggle = false;
+
+unsigned long reconnectPreviousMillis = 0;
+const long reconnectInterval = 1000;
+
+boolean runOnce = true;										// On firststart = true, NTP will try to get a valid time
 int AdminTimeOutCounter = 0;									// Counter for Disabling the AdminMode
-strDateTime DateTime;											// Global DateTime structure, will be refreshed every Second
-WiFiUDP UDPNTPClient;											// NTP Client
-unsigned long UnixTimestamp = 0;								// GLOBALTIME  ( Will be set by NTP)
-boolean Refresh = false; // For Main Loop, to refresh things like GPIO / WS2812
-int cNTP_Update = 0;											// Counter for Updating the time via NTP
-Ticker tkSecond;												// Second - Timer for Updating Datetime Structure
-boolean AdminEnabled = true;		// Enable Admin Mode for a given Time
-byte Minute_Old = 100;				// Helpvariable for checking, when a new Minute comes up (for Auto Turn On / Off)
 
 struct strConfig {
   String ssid;
@@ -22,19 +39,14 @@ struct strConfig {
   byte  Netmask[4];
   byte  Gateway[4];
   boolean dhcp;
-  String ntpServerName;
-  long Update_Time_Via_NTP_Every;
-  long timezone;
-  boolean daylight;
-  String fgColor;
-  String bgColor;
-  boolean AutoTurnOff;
-  boolean AutoTurnOn;
-  byte TurnOffHour;
-  byte TurnOffMinute;
-  byte TurnOnHour;
-  byte TurnOnMinute;
+  boolean AdminEnabled;
 }   config;
+
+
+void setPixel(uint32_t pixelColor) {
+  pixels.setPixelColor(0, pixelColor);
+  pixels.show();
+}
 
 
 /*
@@ -44,13 +56,13 @@ struct strConfig {
 */
 void ConfigureWifi()
 {
-  Serial.println("Configuring Wifi");
-  WiFi.begin (config.ssid.c_str(), config.password.c_str());  
+  Serial.println("Connectiong Wifi Start");
+  WiFi.begin (config.ssid.c_str(), config.password.c_str());
   if (!config.dhcp)
   {
     WiFi.config(IPAddress(config.IP[0], config.IP[1], config.IP[2], config.IP[3] ),  IPAddress(config.Gateway[0], config.Gateway[1], config.Gateway[2], config.Gateway[3] ) , IPAddress(config.Netmask[0], config.Netmask[1], config.Netmask[2], config.Netmask[3] ));
   }
-  
+  Serial.println("Connectiong Wifi Stop");
 }
 
 void WriteConfig()
@@ -61,44 +73,31 @@ void WriteConfig()
   EEPROM.write(1, 'F');
   EEPROM.write(2, 'G');
 
-  EEPROM.write(16, config.dhcp);
-  EEPROM.write(17, config.daylight);
+  EEPROM.write(3, config.dhcp);
 
-  EEPROMWritelong(18, config.Update_Time_Via_NTP_Every); // 4 Byte
+  EEPROM.write(4, config.IP[0]);
+  EEPROM.write(5, config.IP[1]);
+  EEPROM.write(6, config.IP[2]);
+  EEPROM.write(7, config.IP[3]);
 
-  EEPROMWritelong(22, config.timezone); // 4 Byte
+  EEPROM.write(8, config.Netmask[0]);
+  EEPROM.write(9, config.Netmask[1]);
+  EEPROM.write(10, config.Netmask[2]);
+  EEPROM.write(11, config.Netmask[3]);
 
-  EEPROM.write(32, config.IP[0]);
-  EEPROM.write(33, config.IP[1]);
-  EEPROM.write(34, config.IP[2]);
-  EEPROM.write(35, config.IP[3]);
+  EEPROM.write(12, config.Gateway[0]);
+  EEPROM.write(13, config.Gateway[1]);
+  EEPROM.write(14, config.Gateway[2]);
+  EEPROM.write(15, config.Gateway[3]);
 
-  EEPROM.write(36, config.Netmask[0]);
-  EEPROM.write(37, config.Netmask[1]);
-  EEPROM.write(38, config.Netmask[2]);
-  EEPROM.write(39, config.Netmask[3]);
-
-  EEPROM.write(40, config.Gateway[0]);
-  EEPROM.write(41, config.Gateway[1]);
-  EEPROM.write(42, config.Gateway[2]);
-  EEPROM.write(43, config.Gateway[3]);
-
+  EEPROM.write(16, config.AdminEnabled);
 
   WriteStringToEEPROM(64, config.ssid);
   WriteStringToEEPROM(96, config.password);
-  WriteStringToEEPROM(128, config.ntpServerName);
-
-  EEPROM.write(300, config.AutoTurnOn);
-  EEPROM.write(301, config.AutoTurnOff);
-  EEPROM.write(302, config.TurnOnHour);
-  EEPROM.write(303, config.TurnOnMinute);
-  EEPROM.write(304, config.TurnOffHour);
-  EEPROM.write(305, config.TurnOffMinute);
-  WriteStringToEEPROM(306, config.fgColor);
-  WriteStringToEEPROM(315, config.bgColor);
 
   EEPROM.commit();
 }
+
 boolean ReadConfig()
 {
 
@@ -106,39 +105,30 @@ boolean ReadConfig()
   if (EEPROM.read(0) == 'C' && EEPROM.read(1) == 'F'  && EEPROM.read(2) == 'G' )
   {
     Serial.println("Configurarion Found!");
-    config.dhcp = 	EEPROM.read(16);
-
-    config.daylight = EEPROM.read(17);
-
-    config.Update_Time_Via_NTP_Every = EEPROMReadlong(18); // 4 Byte
-
-    config.timezone = EEPROMReadlong(22); // 4 Byte
-
-    config.IP[0] = EEPROM.read(32);
-    config.IP[1] = EEPROM.read(33);
-    config.IP[2] = EEPROM.read(34);
-    config.IP[3] = EEPROM.read(35);
-    config.Netmask[0] = EEPROM.read(36);
-    config.Netmask[1] = EEPROM.read(37);
-    config.Netmask[2] = EEPROM.read(38);
-    config.Netmask[3] = EEPROM.read(39);
-    config.Gateway[0] = EEPROM.read(40);
-    config.Gateway[1] = EEPROM.read(41);
-    config.Gateway[2] = EEPROM.read(42);
-    config.Gateway[3] = EEPROM.read(43);
+    config.dhcp = 	EEPROM.read(3);
+    config.IP[0] = EEPROM.read(4);
+    config.IP[1] = EEPROM.read(5);
+    config.IP[2] = EEPROM.read(6);
+    config.IP[3] = EEPROM.read(7);
+    config.Netmask[0] = EEPROM.read(8);
+    config.Netmask[1] = EEPROM.read(9);
+    config.Netmask[2] = EEPROM.read(10);
+    config.Netmask[3] = EEPROM.read(11);
+    config.Gateway[0] = EEPROM.read(12);
+    config.Gateway[1] = EEPROM.read(13);
+    config.Gateway[2] = EEPROM.read(14);
+    config.Gateway[3] = EEPROM.read(15);
+    config.AdminEnabled = EEPROM.read(16);
     config.ssid = ReadStringFromEEPROM(64);
     config.password = ReadStringFromEEPROM(96);
-    config.ntpServerName = ReadStringFromEEPROM(128);
 
-
-    config.AutoTurnOn = EEPROM.read(300);
-    config.AutoTurnOff = EEPROM.read(301);
-    config.TurnOnHour = EEPROM.read(302);
-    config.TurnOnMinute = EEPROM.read(303);
-    config.TurnOffHour = EEPROM.read(304);
-    config.TurnOffMinute = EEPROM.read(305);
-    config.fgColor = ReadStringFromEEPROM(306);
-    config.bgColor = ReadStringFromEEPROM(315);
+    Serial.println("DHCP: " + String(config.dhcp));
+    Serial.println("IP: " + String(config.IP[0]) + "." + String(config.IP[1]) + "." + String(config.IP[2]) + "." + String(config.IP[3]));
+    Serial.println("Netmask: " + String(config.Netmask[0]) + "." + String(config.Netmask[1]) + "." + String(config.Netmask[2]) + "." + String(config.Netmask[3]));
+    Serial.println("Gateway: " + String(config.Gateway[0]) + "." + String(config.Gateway[1]) + "." + String(config.Gateway[2]) + "." + String(config.Gateway[3]));
+    Serial.println("AdminEnabled: " + String(config.AdminEnabled));
+    Serial.println("SSID: " + config.ssid);
+    Serial.println("Password: " + config.password);
     return true;
 
   }
@@ -149,85 +139,27 @@ boolean ReadConfig()
   }
 }
 
-/*
-**
-**  NTP
-**
-*/
-
-const int NTP_PACKET_SIZE = 48;
-byte packetBuffer[ NTP_PACKET_SIZE];
-void NTPRefresh()
-{
-
-
-
-
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    IPAddress timeServerIP;
-    WiFi.hostByName(config.ntpServerName.c_str(), timeServerIP);
-    //sendNTPpacket(timeServerIP); // send an NTP packet to a time server
-
-
-    Serial.println("sending NTP packet...");
-    memset(packetBuffer, 0, NTP_PACKET_SIZE);
-    packetBuffer[0] = 0b11100011;   // LI, Version, Mode
-    packetBuffer[1] = 0;     // Stratum, or type of clock
-    packetBuffer[2] = 6;     // Polling Interval
-    packetBuffer[3] = 0xEC;  // Peer Clock Precision
-    packetBuffer[12]  = 49;
-    packetBuffer[13]  = 0x4E;
-    packetBuffer[14]  = 49;
-    packetBuffer[15]  = 52;
-    UDPNTPClient.beginPacket(timeServerIP, 123);
-    UDPNTPClient.write(packetBuffer, NTP_PACKET_SIZE);
-    UDPNTPClient.endPacket();
-
-
-    delay(1000);
-
-    int cb = UDPNTPClient.parsePacket();
-    if (!cb) {
-      Serial.println("NTP no packet yet");
-    }
-    else
-    {
-      Serial.print("NTP packet received, length=");
-      Serial.println(cb);
-      UDPNTPClient.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
-      unsigned long highWord = word(packetBuffer[40], packetBuffer[41]);
-      unsigned long lowWord = word(packetBuffer[42], packetBuffer[43]);
-      unsigned long secsSince1900 = highWord << 16 | lowWord;
-      const unsigned long seventyYears = 2208988800UL;
-      unsigned long epoch = secsSince1900 - seventyYears;
-      UnixTimestamp = epoch;
-    }
-  }
-}
-
 void Second_Tick()
 {
-  strDateTime tempDateTime;
-  AdminTimeOutCounter++;
-  cNTP_Update++;
-  UnixTimestamp++;
-  ConvertUnixTimeStamp(UnixTimestamp +  (config.timezone *  360) , &tempDateTime);
-  if (config.daylight) // Sommerzeit beachten
-    if (summertime(tempDateTime.year, tempDateTime.month, tempDateTime.day, tempDateTime.hour, 0))
-    {
-      ConvertUnixTimeStamp(UnixTimestamp +  (config.timezone *  360) + 3600, &DateTime);
-    }
-    else
-    {
-      DateTime = tempDateTime;
-    }
-  else
-  {
-    DateTime = tempDateTime;
+  if (digitalRead(BUTTON_PIN) == LOW) {
+    Serial.println("BUTTON");
+    config.AdminEnabled = true;
+    WriteConfig();
+    setPixel(pixels.Color(255, 255, 255));
+    delay(1000);
+    ESP.restart();
   }
-  Refresh = true;
+  if (config.AdminEnabled) {
+    AdminTimeOutCounter++;
+    if (pixelToggle)
+      setPixel(pixels.Color(0, 0, 0));
+    else
+      setPixel(pixels.Color(0, 0, 255));
+    pixelToggle = !pixelToggle;
+  } else {
+    if (WiFi.status() != WL_CONNECTED) {
+      Serial.print(".");
+    }
+  }
 }
-
-
 #endif

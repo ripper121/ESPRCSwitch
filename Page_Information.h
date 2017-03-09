@@ -1,7 +1,5 @@
 #ifndef PAGE_INFOMATION_H
 #define PAGE_INFOMATION_H
-
-
 //
 //   The HTML PAGE
 //
@@ -10,7 +8,7 @@ const char PAGE_Information[] PROGMEM = R"=====(
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="style.css" type="text/css" />
 <script src="microajax.js"></script> 
-<a href="admin.html"  class="btn btn--s"><</a>&nbsp;&nbsp;<strong>Network Information</strong>
+<a href="/"  class="btn btn--s"><</a>&nbsp;&nbsp;<strong>Network Information</strong>
 <hr>
 <table border="0"  cellspacing="0" cellpadding="3" style="width:310px" >
 <tr><td align="right">SSID :</td><td><span id="x_ssid"></span></td></tr>
@@ -18,9 +16,6 @@ const char PAGE_Information[] PROGMEM = R"=====(
 <tr><td align="right">Netmask :</td><td><span id="x_netmask"></span></td></tr>
 <tr><td align="right">Gateway :</td><td><span id="x_gateway"></span></td></tr>
 <tr><td align="right">Mac :</td><td><span id="x_mac"></span></td></tr>
-
-<tr><td colspan="2"><hr></span></td></tr>
-<tr><td align="right">NTP Time:</td><td><span id="x_ntp"></span></td></tr>
 
 
 <tr><td colspan="2" align="center"><a href="javascript:GetState()" class="btn btn--m btn--blue">Refresh</a></td></tr>
@@ -64,7 +59,6 @@ void send_information_values_html ()
 	values += "x_gateway|" +  (String) WiFi.gatewayIP()[0] + "." +  (String) WiFi.gatewayIP()[1] + "." +  (String) WiFi.gatewayIP()[2] + "." + (String) WiFi.gatewayIP()[3] +  "|div\n";
 	values += "x_netmask|" +  (String) WiFi.subnetMask()[0] + "." +  (String) WiFi.subnetMask()[1] + "." +  (String) WiFi.subnetMask()[2] + "." + (String) WiFi.subnetMask()[3] +  "|div\n";
 	values += "x_mac|" + GetMacAddress() +  "|div\n";
-	values += "x_ntp|" +  (String) DateTime.hour + ":" + (String) + DateTime.minute +  ":"  + (String)  DateTime.second + ", " + (String)  DateTime.day  + "." + (String)  DateTime.month + "." + (String)  DateTime.year +  "|div\n";
 	server.send ( 200, "text/plain", values);
 	Serial.println(__FUNCTION__); 
 

@@ -2,13 +2,14 @@
 //  HTML PAGE
 //
 
-const char PAGE_AdminMainPage[] PROGMEM = R"=====(
+const char PAGE_AdminMainPageSTA[] PROGMEM = R"=====(
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <strong>Administration</strong>
 <hr>
+<a href="send.html" style="width:250px" class="btn btn--m btn--blue" >Send</a><br>
+<a href="receive.html" style="width:250px" class="btn btn--m btn--blue" >Receive</a><br>
 <a href="config.html" style="width:250px" class="btn btn--m btn--blue" >Configuration</a><br>
 <a href="info.html"   style="width:250px"  class="btn btn--m btn--blue" >Information</a><br>
-<a href="adminoff.html"   style="width:250px"  class="btn btn--m btn--blue" >Activate Gateway</a><br>
 
 
 
