@@ -22,7 +22,7 @@ border: 1px solid #7FDBFF;
 	-webkit-transition: background-color 0.3s, color 0.3s, border 0.3s;  
 transition: background-color 0.3s, color 0.3s, border 0.3s; 
 }
-	.btn:active {  
+.btn:active {  
 color: #0074D9;  
 border: 1px solid #0074D9;  
 		-webkit-transition: background-color 0.3s, color 0.3s, border 0.3s;  

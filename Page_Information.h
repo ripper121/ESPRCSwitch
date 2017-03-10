@@ -16,8 +16,6 @@ const char PAGE_Information[] PROGMEM = R"=====(
 <tr><td align="right">Netmask :</td><td><span id="x_netmask"></span></td></tr>
 <tr><td align="right">Gateway :</td><td><span id="x_gateway"></span></td></tr>
 <tr><td align="right">Mac :</td><td><span id="x_mac"></span></td></tr>
-
-
 <tr><td colspan="2" align="center"><a href="javascript:GetState()" class="btn btn--m btn--blue">Refresh</a></td></tr>
 </table>
 <script>
@@ -38,9 +36,6 @@ window.onload = function ()
 	});
 }
 function load(e,t,n){if("js"==t){var a=document.createElement("script");a.src=e,a.type="text/javascript",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}else if("css"==t){var a=document.createElement("link");a.href=e,a.rel="stylesheet",a.type="text/css",a.async=!1,a.onload=function(){n()},document.getElementsByTagName("head")[0].appendChild(a)}}
-
-
-
 </script>
 )=====" ;
 
@@ -60,8 +55,6 @@ void send_information_values_html ()
 	values += "x_netmask|" +  (String) WiFi.subnetMask()[0] + "." +  (String) WiFi.subnetMask()[1] + "." +  (String) WiFi.subnetMask()[2] + "." + (String) WiFi.subnetMask()[3] +  "|div\n";
 	values += "x_mac|" + GetMacAddress() +  "|div\n";
 	server.send ( 200, "text/plain", values);
-	Serial.println(__FUNCTION__); 
-
 }
 
 

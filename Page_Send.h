@@ -6,17 +6,20 @@
 const char PAGE_Send[] PROGMEM = R"=====(
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
   <link rel="stylesheet" href="style.css" type="text/css" />
   <script src="microajax.js"></script> 
   <a href="/"  class="btn btn--s"><</a>&nbsp;&nbsp;<strong>Send 433Mhz</strong>
   <hr>
 
   <form action="" method="get"> 
-    <table border="0"  cellspacing="0" cellpadding="3" style="width:310px" >
-      <tr><td><input type="text" id="code" name="code" value=""></td></tr>
+    <table border="0"  cellspacing="0" cellpadding="3" style="width:auto" >
+      <tr><td><input type="text" id="code" name="code" style="width:auto"  value=""></td></tr>
+      <tr><td>&nbsp;</td></tr>
       <tr><td><input type="submit" style="width:150px" class="btn btn--m btn--blue" value="Send"></td></tr>
     </table>  
   </form>
+  <hr>
   
   <script>
     window.onload = function ()
@@ -25,7 +28,7 @@ const char PAGE_Send[] PROGMEM = R"=====(
       {
         load("microajax.js","js", function() 
         {
-            setValues("/admin/filldynamicdata");  //-- this function calls the function on the ESP      
+            setValues("/fillsenddata");  //-- this function calls the function on the ESP      
         });
       });
     }
@@ -34,31 +37,39 @@ const char PAGE_Send[] PROGMEM = R"=====(
 
 )=====" ;
 
+String txCodes="";
 void processSend()
 {        
     if (server.args() > 0 )  // Are there any POST/GET Fields ? 
     {
        for ( uint8_t i = 0; i < server.args(); i++ ) {  // Iterate through the fields
             if (server.argName(i) == "code") 
-            {
+            {             
               // Your processing for the transmitted form-variable 
               int length = 0;
               uint16_t codes[MAXPULSESTREAMLENGTH];
-              String txCodes=server.arg(i);
-              
+              setPixel(pixels.Color(128, 128, 128));
+              txCodes=server.arg(i);              
               // get pulse train from string (format see: pilight USB Nano)
               length = rf.stringToPulseTrain(txCodes, codes, MAXPULSESTREAMLENGTH);
               
               // transmit the pulse train
-              rf.disableReceiver();
+              rf._enabledReceiver=false;
               rf.sendPulseTrain(codes, length);
-              rf.enableReceiver();
-              Serial.print("Send:");
-              Serial.println(txCodes);
+              rf._enabledReceiver=true;
+              //Serial.print("Send:");
+              //Serial.println(txCodes);
             }
         }
     }
     server.send ( 200, "text/html", PAGE_Send  ); 
+}
+
+void fillsenddata()
+{        
+    String values ="";
+    values += "code|" + (String) txCodes + "|input\n";      
+    server.send ( 200, "text/plain", values);   
 }
 
 

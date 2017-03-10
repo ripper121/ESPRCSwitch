@@ -8,7 +8,6 @@
 #include <EEPROM.h>
 #include <ESPiLight.h>
 #include <Adafruit_NeoPixel.h>
-
 #include "helpers.h"
 #include "global.h"
 /*
@@ -27,22 +26,23 @@
 void setup ( void ) {
   pinMode(BUTTON_PIN, INPUT);
   pixels.begin();
-  for (byte i = 0; i < 3; i++) {
-    byte j = 0;
-    for (j = 0; j < 255; j++) {
-      setPixel(pixels.Color(j, 0, j));
-      delay(5);
-    }
-    for (j = 255; j > 0; j--) {
-      setPixel(pixels.Color(j, 0, j));
-      delay(5);
-    }
-  }
-
   EEPROM.begin(512);
   Serial.begin(115200);
   Serial.println("");
   Serial.println("Starting ES8266");
+
+  for (byte i = 0; i < 3; i++) {
+    byte j = 0;
+    for (j = 0; j < 255; j++) {
+      setPixel(pixels.Color(j, 0, j));
+      delay(1);
+    }
+    for (j = 255; j > 0; j--) {
+      setPixel(pixels.Color(j, 0, j));
+      delay(1);
+    }
+  }
+
 
   if (!ReadConfig())
   {
@@ -62,133 +62,101 @@ void setup ( void ) {
   String AP_SSID = WiFi.softAPmacAddress();
   AP_SSID = "gw433-" + String(AP_SSID[12]) + String(AP_SSID[13]) + String(AP_SSID[15]) + String(AP_SSID[16]) + '.';
   AP_SSID.toCharArray(charBuf, AP_SSID.length());
+  WiFi.hostname(AP_SSID);
+
+  server.on ( "/config.html", []() {
+    send_network_configuration_html();
+  }  );
+
+  server.on ( "/info.html", []() {
+    server.send ( 200, "text/html", PAGE_Information );
+  }  );
+
+  server.on ( "/favicon.ico",   []() {
+    server.send ( 200, "text/html", "" );
+  }  );
+
+  server.on ( "/style.css", []() {
+    server.send ( 200, "text/plain", PAGE_Style_css );
+    rf._enabledReceiver = false;
+    setPixel(pixels.Color(0, 0, 255));
+  } );
+  server.on ( "/microajax.js", []() {
+    server.send ( 200, "text/plain", PAGE_microajax_js );
+  } );
+  server.on ( "/admin/values", send_network_configuration_values_html );
+  server.on ( "/admin/connectionstate", send_connection_state_values_html );
+  server.on ( "/admin/infovalues", send_information_values_html );
+
+  server.onNotFound ( []() {
+    server.send ( 400, "text/html", "Page not Found" );
+    rf._enabledReceiver = false;
+    setPixel(pixels.Color(0, 0, 255));
+  }  );
+
 
   if (config.AdminEnabled) {
-    server.on ( "/favicon.ico",   []() {
-      //Serial.println("favicon.ico");
-      server.send ( 200, "text/html", "" );
-    }  );
-
-
     server.on ( "/", []() {
-      Serial.println("admin.html");
       server.send ( 200, "text/html", PAGE_AdminMainPage );
     }  );
 
     server.on ( "/adminoff.html", []() {
-      Serial.println("adminoff.html");
       server.send ( 200, "text/html", "Device will reboot and connect to your Network.");
       AdminTimeOutCounter = AdminTimeOut;
     }  );
 
-    server.on ( "/config.html", send_network_configuration_html );
-    server.on ( "/info.html", []() {
-      Serial.println("info.html");
-      server.send ( 200, "text/html", PAGE_Information );
-    }  );
-
-    //  server.on ( "/example.html", []() { server.send ( 200, "text/html", PAGE_EXAMPLE );  } );
-    server.on ( "/style.css", []() {
-      Serial.println("style.css");
-      server.send ( 200, "text/plain", PAGE_Style_css );
-    } );
-    server.on ( "/microajax.js", []() {
-      Serial.println("microajax.js");
-      server.send ( 200, "text/plain", PAGE_microajax_js );
-    } );
-    server.on ( "/admin/values", send_network_configuration_values_html );
-    server.on ( "/admin/connectionstate", send_connection_state_values_html );
-    server.on ( "/admin/infovalues", send_information_values_html );
-
-    server.onNotFound ( []() {
-      //Serial.println("Page Not Found");
-      server.send ( 400, "text/html", "Page not Found" );
-    }  );
-
-    httpUpdater.setup(&server);
-
-    WiFi.hostname(AP_SSID);
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP(charBuf, "");
 
-    server.begin();
     Serial.println("WIFI_AP_STA");
     Serial.println("AP_SSID:" + AP_SSID);
-    Serial.println( "HTTP server started" );
-    Serial.print("Server address: ");
+    Serial.print("Server IP address: ");
     Serial.println(WiFi.softAPIP());
-    ConfigureWifi();
   } else {
-    server.on ( "/favicon.ico",   []() {
-      //Serial.println("favicon.ico");
-      server.send ( 200, "text/html", "" );
-    }  );
-
     server.on ( "/", []() {
-      Serial.println("admin.html");
       server.send ( 200, "text/html", PAGE_AdminMainPageSTA );
     }  );
 
-    server.on ( "/config.html", send_network_configuration_html );
-    server.on ( "/info.html", []() {
-      Serial.println("info.html");
-      server.send ( 200, "text/html", PAGE_Information );
-    }  );
-
     server.on ( "/send.html", []() {
-      Serial.println("send.html");
       processSend();
     }  );
+    server.on ( "/fillsenddata", fillsenddata );
 
     server.on ( "/receive.html", []() {
-      Serial.println("receive.html");
+      for ( byte i = 0; i < ARRAYSIZE;  ++i ) {
+        results[i] = "-";
+        resultsTime[i] = "0";
+      }
       server.send ( 200, "text/html", PAGE_Receive );
     }  );
-    server.on ( "/filldynamicdata", filldynamicdata );
-
-    //  server.on ( "/example.html", []() { server.send ( 200, "text/html", PAGE_EXAMPLE );  } );
-    server.on ( "/style.css", []() {
-      Serial.println("style.css");
-      server.send ( 200, "text/plain", PAGE_Style_css );
-    } );
-    server.on ( "/microajax.js", []() {
-      Serial.println("microajax.js");
-      server.send ( 200, "text/plain", PAGE_microajax_js );
-    } );
-    server.on ( "/admin/values", send_network_configuration_values_html );
-    server.on ( "/admin/connectionstate", send_connection_state_values_html );
-    server.on ( "/admin/infovalues", send_information_values_html );
-
-    server.onNotFound ( []() {
-      //Serial.println("Page Not Found");
-      server.send ( 400, "text/html", "Page not Found" );
+    server.on ( "/fillReceivedata", fillReceivedata );
+    server.on ( "/startRec", []() {
+      rf._enabledReceiver = true;
+      setPixel(pixels.Color(0, 128, 0));
+    }  );
+    server.on ( "/stopRec", []() {
+      rf._enabledReceiver = false;
+      setPixel(pixels.Color(0, 0, 255));
     }  );
 
-    httpUpdater.setup(&server);
-    server.begin();
-
     Serial.println("WIFI_STA");
-    WiFi.hostname(AP_SSID);
     WiFi.mode(WIFI_STA);
-    ConfigureWifi();
+
     //set callback funktion for raw messages
     rf.setPulseTrainCallBack(rfRawCallback);
     //inittilize receiver
     rf.initReceiver(RECEIVER_PIN);
-    rf.disableReceiver();
+    rf._enabledReceiver = false;
   }
+
+  ConfigureWifi();
   tkSecond.attach(1, Second_Tick);
-  Serial.println("Start Tick");
+  httpUpdater.setup(&server);
+  server.begin();
+  Serial.println( "HTTP server started" );
 }
 
-// callback function. It is called on successfully received and parsed rc signal
-void rfRawCallback(const uint16_t* codes, int length) {
-  if (length >= MINPULSESTREAMLENGTH && length <= MAXPULSESTREAMLENGTH && !rfRawReady) {
-    String data = rf.pulseTrainToString(codes, length);
-    rfRawRec = data;
-    rfRawReady = true;
-  }
-}
+
 
 void loop ( void ) {
   if (config.AdminEnabled)
@@ -213,44 +181,49 @@ void loop ( void ) {
           config.IP[3] = ip[3];
           WriteConfig();
         }
-        Serial.print("Connected, IP address: ");
+        Serial.print("Server IP address: ");
         Serial.println(WiFi.localIP());
         setPixel(pixels.Color(0, 0, 255));
-        rf.enableReceiver();
         runOnce = false;
       }
+
       if (rfRawReady) {
         String rfRawRecRepl = rfRawRec;
         byte charCount = 0;
+        char buffer[25];
 
         rfRawRecRepl.replace(": ", "");
         charCount = rfRawRec.length() - rfRawRecRepl.length();
 
         if (rfRawRec.indexOf('<') == -1 && rfRawRec.indexOf('>') == -1 && rfRawRec.indexOf('=') == -1 && charCount < 3 && rfRawRec.length() > 5) {
-          Serial.println(rfRawRec);
-          results[resultCounter] = rfRawRec;
-          resultCounter++;
-          if (resultCounter > 9) {
-            resultCounter = 0;
+          float timeRX = millis();
+          timeRX /= 1000;
+          //Serial.println(rfRawRec);
+          for (byte i = 0; i < ARRAYSIZE - 1; i++) {
+            results[i] = results[i + 1];
+            resultsTime[i] = resultsTime[i + 1];
           }
+          resultsTime[ARRAYSIZE - 1] = dtostrf(timeRX, 5, 2, buffer);
+          results[ARRAYSIZE - 1] = rfRawRec;
+
+          if (pixelToggle)
+            setPixel(pixels.Color(0, 64, 0));
+          else
+            setPixel(pixels.Color(0, 128, 0));
+          pixelToggle = !pixelToggle;
         }
-
-        if (pixelToggle)
-          setPixel(pixels.Color(0, 64, 0));
-        else
-          setPixel(pixels.Color(0, 255, 0));
-        pixelToggle = !pixelToggle;
-
         rfRawRec = "";
         rfRawReady = false;
       }
-
       if (!rfRawReady)
         rf.loop();
+
     } else {
-      rf.disableReceiver();
+
+      rf._enabledReceiver = false;
       setPixel(pixels.Color(255, 0, 0));
       runOnce = true;
+
     }
   }
 

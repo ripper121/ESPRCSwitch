@@ -106,7 +106,6 @@ void send_network_configuration_html()
 	{
 		server.send ( 200, "text/html", PAGE_NetworkConfiguration ); 
 	}
-	Serial.println(__FUNCTION__); 
 }
 
 
@@ -135,9 +134,7 @@ void send_network_configuration_values_html()
 	values += "gw_2|" +  (String) config.Gateway[2] + "|input\n";
 	values += "gw_3|" +  (String) config.Gateway[3] + "|input\n";
 	values += "dhcp|" +  (String) (config.dhcp ? "checked" : "") + "|chk\n";
-	server.send ( 200, "text/plain", values);
-	Serial.println(__FUNCTION__); 
-	
+	server.send ( 200, "text/plain", values);	
 }
 
 
@@ -198,7 +195,5 @@ void send_connection_state_values_html()
 	String values ="";
 	values += "connectionstate|" +  state + "|div\n";
 	values += "networks|" +  Networks + "|div\n";
-	server.send ( 200, "text/plain", values);
-	Serial.println(__FUNCTION__); 
-	
+	server.send ( 200, "text/plain", values);	
 }

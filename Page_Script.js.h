@@ -19,8 +19,11 @@ function setValues(url)
 		{
 				document.getElementById(fields[0]).checked  = fields[1];
 		}
+    else if(fields[2] == "a")
+    {
+        document.getElementById(fields[0]).href  = fields[1];
+    }
 	  });
 	});
 }
-
 )=====";

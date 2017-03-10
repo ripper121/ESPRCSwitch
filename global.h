@@ -21,7 +21,8 @@ Ticker tkSecond;                        // Second - Timer for Updating Datetime 
 String rfRawRec = "";
 bool rfRawReady = false;
 
-String results[ARRAYSIZE] = { "", "", "", "", "", "", "", "", "", "" };
+String results[ARRAYSIZE] = { "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" };
+String resultsTime[ARRAYSIZE] = { "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" };
 byte resultCounter = 0;
 
 bool pixelToggle = false;
@@ -48,6 +49,16 @@ void setPixel(uint32_t pixelColor) {
   pixels.show();
 }
 
+// callback function. It is called on successfully received and parsed rc signal
+void rfRawCallback(const uint16_t* codes, int length) {
+  if (length >= MINPULSESTREAMLENGTH && length <= MAXPULSESTREAMLENGTH && !rfRawReady) {
+    String data = rf.pulseTrainToString(codes, length);
+    rfRawRec = data;
+    rfRawReady = true;
+  }
+}
+
+
 
 /*
 **
@@ -56,13 +67,11 @@ void setPixel(uint32_t pixelColor) {
 */
 void ConfigureWifi()
 {
-  Serial.println("Connectiong Wifi Start");
   WiFi.begin (config.ssid.c_str(), config.password.c_str());
   if (!config.dhcp)
   {
     WiFi.config(IPAddress(config.IP[0], config.IP[1], config.IP[2], config.IP[3] ),  IPAddress(config.Gateway[0], config.Gateway[1], config.Gateway[2], config.Gateway[3] ) , IPAddress(config.Netmask[0], config.Netmask[1], config.Netmask[2], config.Netmask[3] ));
   }
-  Serial.println("Connectiong Wifi Stop");
 }
 
 void WriteConfig()
@@ -121,14 +130,6 @@ boolean ReadConfig()
     config.AdminEnabled = EEPROM.read(16);
     config.ssid = ReadStringFromEEPROM(64);
     config.password = ReadStringFromEEPROM(96);
-
-    Serial.println("DHCP: " + String(config.dhcp));
-    Serial.println("IP: " + String(config.IP[0]) + "." + String(config.IP[1]) + "." + String(config.IP[2]) + "." + String(config.IP[3]));
-    Serial.println("Netmask: " + String(config.Netmask[0]) + "." + String(config.Netmask[1]) + "." + String(config.Netmask[2]) + "." + String(config.Netmask[3]));
-    Serial.println("Gateway: " + String(config.Gateway[0]) + "." + String(config.Gateway[1]) + "." + String(config.Gateway[2]) + "." + String(config.Gateway[3]));
-    Serial.println("AdminEnabled: " + String(config.AdminEnabled));
-    Serial.println("SSID: " + config.ssid);
-    Serial.println("Password: " + config.password);
     return true;
 
   }
@@ -154,11 +155,16 @@ void Second_Tick()
     if (pixelToggle)
       setPixel(pixels.Color(0, 0, 0));
     else
-      setPixel(pixels.Color(0, 0, 255));
+      setPixel(pixels.Color(255, 0, 255));
     pixelToggle = !pixelToggle;
   } else {
     if (WiFi.status() != WL_CONNECTED) {
       Serial.print(".");
+      if (pixelToggle)
+        setPixel(pixels.Color(0, 0, 0));
+      else
+        setPixel(pixels.Color(0, 0, 255));
+      pixelToggle = !pixelToggle;
     }
   }
 }
