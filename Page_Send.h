@@ -56,7 +56,7 @@ void processSend()
               // transmit the pulse train
               rf._enabledReceiver=false;
               rf.sendPulseTrain(codes, length);
-              rf._enabledReceiver=true;
+              //rf._enabledReceiver=true;
               //Serial.print("Send:");
               //Serial.println(txCodes);
             }
