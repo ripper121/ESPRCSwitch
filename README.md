@@ -8,8 +8,13 @@ I use a modified version of https://github.com/puuu/ESPiLight
 
 | Screenshots |
 | ------ |
+|Index Page|
 |![Alt text](/screenshots/index.png?raw=true "Index Page")|
+|Send Page|
 |![Alt text](/screenshots/send.png?raw=true "Send Page")|
+|Receive Page|
 |![Alt text](/screenshots/receive.png?raw=true "Receive Page")|
+|Config Page|
 |![Alt text](/screenshots/config.png?raw=true "Config Page")|
+|Info Page|
 |![Alt text](/screenshots/info.png?raw=true "Info Page")|
