@@ -140,7 +140,7 @@ boolean ReadConfig()
   }
 }
 
-void Second_Tick()
+void getButton()
 {
   if (digitalRead(BUTTON_PIN) == LOW) {
     Serial.println("BUTTON");
@@ -150,6 +150,11 @@ void Second_Tick()
     delay(1000);
     ESP.restart();
   }
+}
+
+void Second_Tick()
+{
+  getButton();
   if (config.AdminEnabled) {
     AdminTimeOutCounter++;
     if (pixelToggle)
@@ -168,4 +173,7 @@ void Second_Tick()
     }
   }
 }
+
+
+
 #endif

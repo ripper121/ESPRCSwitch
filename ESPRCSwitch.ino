@@ -2,12 +2,20 @@
   Todo:
   - add config for TCP Server:Port
 */
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
 #include <ESP8266WebServer.h>
+
 #include <ESP8266HTTPUpdateServer.h>
+
 #include <Ticker.h>
+
 #include <EEPROM.h>
+
 #include <ESPiLight.h>
+
 #include <Adafruit_NeoPixel.h>
+
 #include "helpers.h"
 #include "global.h"
 /*
@@ -31,6 +39,7 @@ void setup ( void ) {
   Serial.println("");
   Serial.println("Starting ES8266");
 
+
   for (byte i = 0; i < 3; i++) {
     byte j = 0;
     for (j = 0; j < 255; j++) {
@@ -43,6 +52,12 @@ void setup ( void ) {
     }
   }
 
+  char charBuf[25];
+  String AP_SSID = WiFi.softAPmacAddress();
+  AP_SSID = "gw433-" + String(AP_SSID[12]) + String(AP_SSID[13]) + String(AP_SSID[15]) + String(AP_SSID[16]) + '.';
+  AP_SSID.toCharArray(charBuf, AP_SSID.length());
+
+  getButton();
 
   if (!ReadConfig())
   {
@@ -53,16 +68,10 @@ void setup ( void ) {
     config.IP[0] = 192; config.IP[1] = 168; config.IP[2] = 1; config.IP[3] = 100;
     config.Netmask[0] = 255; config.Netmask[1] = 255; config.Netmask[2] = 255; config.Netmask[3] = 0;
     config.Gateway[0] = 192; config.Gateway[1] = 168; config.Gateway[2] = 1; config.Gateway[3] = 1;
-    config.AdminEnabled = false;
+    config.AdminEnabled = true;
     WriteConfig();
     Serial.println("General config applied");
   }
-
-  char charBuf[25];
-  String AP_SSID = WiFi.softAPmacAddress();
-  AP_SSID = "gw433-" + String(AP_SSID[12]) + String(AP_SSID[13]) + String(AP_SSID[15]) + String(AP_SSID[16]) + '.';
-  AP_SSID.toCharArray(charBuf, AP_SSID.length());
-  WiFi.hostname(AP_SSID);
 
   server.on ( "/config.html", []() {
     send_network_configuration_html();
@@ -94,8 +103,9 @@ void setup ( void ) {
     setPixel(pixels.Color(0, 0, 255));
   }  );
 
-
   if (config.AdminEnabled) {
+    WiFi.softAP(charBuf, "");
+
     server.on ( "/", []() {
       server.send ( 200, "text/html", PAGE_AdminMainPage );
     }  );
@@ -105,14 +115,13 @@ void setup ( void ) {
       AdminTimeOutCounter = AdminTimeOut;
     }  );
 
-    WiFi.mode(WIFI_AP_STA);
-    WiFi.softAP(charBuf, "");
-
-    Serial.println("WIFI_AP_STA");
     Serial.println("AP_SSID:" + AP_SSID);
     Serial.print("Server IP address: ");
     Serial.println(WiFi.softAPIP());
+
   } else {
+    WiFi.mode(WIFI_STA);
+    
     server.on ( "/", []() {
       server.send ( 200, "text/html", PAGE_AdminMainPageSTA );
     }  );
@@ -139,9 +148,6 @@ void setup ( void ) {
       setPixel(pixels.Color(0, 0, 255));
     }  );
 
-    Serial.println("WIFI_STA");
-    WiFi.mode(WIFI_STA);
-
     //set callback funktion for raw messages
     rf.setPulseTrainCallBack(rfRawCallback);
     //inittilize receiver
@@ -150,10 +156,12 @@ void setup ( void ) {
   }
 
   ConfigureWifi();
-  tkSecond.attach(1, Second_Tick);
+
   httpUpdater.setup(&server);
   server.begin();
   Serial.println( "HTTP server started" );
+
+  tkSecond.attach(1, Second_Tick);
 }
 
 
